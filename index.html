@@ -10,20 +10,20 @@
     body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 bg-cover bg-center bg-fixed relative" style="background-image: linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)), url('bg.jpg');">
 
   <!-- Header -->
-  <header class="bg-slate-800 border-b border-slate-700 py-6 px-4 shadow-lg sticky top-0 z-50">
-<div class="flex items-center gap-3">
-        <img src="patas-3-logo.png" alt="Patas de Ouro 3 Logo" class="h-12 w-auto object-contain">
+  <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 py-6 px-4 shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="patas-3-logo.png" alt="Patas de Ouro 3 Logo" class="h-12 w-auto object-contain" onerror="this.style.display='none'">
         <div>
           <h1 class="text-2xl font-extrabold text-amber-400">Patas de Ouro 3º Edição</h1>
           <p class="text-xs text-slate-400">Versão 1.2 (05/09/2026)</p>
         </div>
       </div>
-      </div>
 
-      <!-- Filtro de Categorias -->
+      <!-- Filtro de Categorias (Botões rápidos) -->
       <div class="flex flex-wrap gap-2" id="category-tabs">
         <button onclick="setCategory('all')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-amber-500 text-slate-950" data-cat="all">Todas</button>
         <button onclick="setCategory('Inter')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 hover:bg-slate-600" data-cat="Inter">Inter</button>
@@ -35,13 +35,13 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-4 mt-8">
-    <!-- Busca -->
+    <!-- Campo de Busca Avançado -->
     <div class="mb-8">
-      <input type="text" id="search-input" oninput="render()" placeholder="🔍 Pesquisar por música ou nível..." 
-             class="w-full md:w-96 px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-400 text-slate-100 placeholder-slate-500 shadow-sm">
+      <input type="text" id="search-input" oninput="render()" placeholder="🔍 Pesquise por música, nível, fase ou categoria (ex: Expert, Single 12, 1ª Fase)..." 
+             class="w-full md:w-3/4 lg:w-1/2 px-4 py-3 bg-slate-800/90 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-400 text-slate-100 placeholder-slate-400 shadow-lg backdrop-blur">
     </div>
 
-    <!-- Container de Conteúdo -->
+    <!-- Container do Conteúdo -->
     <div id="content" class="space-y-10"></div>
   </main>
 
@@ -159,7 +159,7 @@
     }
 
     function render() {
-      const query = document.getElementById('search-input').value.toLowerCase();
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
       const container = document.getElementById('content');
       container.innerHTML = '';
 
@@ -168,22 +168,30 @@
         : [activeCategory];
 
       categoriesToRender.forEach(cat => {
+        const catMatches = cat.toLowerCase().includes(query);
         const phases = tournamentData[cat];
         let categoryHasMatch = false;
 
         const catSection = document.createElement('section');
-        catSection.className = 'bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 backdrop-blur';
+        catSection.className = 'bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 backdrop-blur shadow-xl';
 
         let html = `<h2 class="text-2xl font-extrabold text-amber-400 mb-6 border-b border-slate-700 pb-3">${cat}</h2>`;
         html += `<div class="space-y-8">`;
 
         phases.forEach(p => {
-          // Filtra os níveis que têm músicas correspondentes à busca
+          const phaseMatches = p.phase.toLowerCase().includes(query);
+
           const matchingLevels = p.levels.map(lvl => {
-            const songs = lvl.songs.filter(s => 
-              s.toLowerCase().includes(query) || lvl.name.toLowerCase().includes(query)
-            );
-            return { name: lvl.name, songs };
+            const lvlMatches = lvl.name.toLowerCase().includes(query);
+
+            // Se a busca bater com Categoria, Fase ou Nível, mostra todas as músicas do bloco.
+            // Se não, filtra música por música.
+            if (catMatches || phaseMatches || lvlMatches || query === '') {
+              return { name: lvl.name, songs: lvl.songs };
+            } else {
+              const songs = lvl.songs.filter(s => s.toLowerCase().includes(query));
+              return { name: lvl.name, songs };
+            }
           }).filter(lvl => lvl.songs.length > 0);
 
           if (matchingLevels.length > 0) {
@@ -205,7 +213,7 @@
                         ${lvl.songs.map(song => `<span class="bg-slate-900 border border-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded-md">${song}</span>`).join('')}
                       </div>
                     </div>
-                  `).map(item => item).join('')}
+                  `).join('')}
                 </div>
               </div>
             `;
@@ -221,7 +229,7 @@
       });
 
       if (container.children.length === 0) {
-        container.innerHTML = `<p class="text-center text-slate-500 py-12">Nenhuma música ou nível encontrado.</p>`;
+        container.innerHTML = `<p class="text-center text-slate-400 py-12 text-lg">Nenhum resultado encontrado para "<strong>${query}</strong>".</p>`;
       }
     }
 
