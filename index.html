@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista Patas de Ouro 3 v1.2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="bg-slate-800 border-b border-slate-700 py-6 px-4 shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-extrabold text-amber-400">Patas de Ouro 3</h1>
+        <p class="text-xs text-slate-400">Versão 1.2 (05/09/2026)</p>
+      </div>
+
+      <!-- Filtro de Categorias -->
+      <div class="flex flex-wrap gap-2" id="category-tabs">
+        <button onclick="setCategory('all')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-amber-500 text-slate-950" data-cat="all">Todas</button>
+        <button onclick="setCategory('Inter')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 hover:bg-slate-600" data-cat="Inter">Inter</button>
+        <button onclick="setCategory('Advanced')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 hover:bg-slate-600" data-cat="Advanced">Advanced</button>
+        <button onclick="setCategory('Expert')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 hover:bg-slate-600" data-cat="Expert">Expert</button>
+        <button onclick="setCategory('CoOp')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 hover:bg-slate-600" data-cat="CoOp">CoOp</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 mt-8">
+    <!-- Busca -->
+    <div class="mb-8">
+      <input type="text" id="search-input" oninput="render()" placeholder="🔍 Pesquisar música..." 
+             class="w-full md:w-96 px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-400 text-slate-100 placeholder-slate-500 shadow-sm">
+    </div>
+
+    <!-- Container de Músicas/Fases -->
+    <div id="content" class="space-y-10"></div>
+  </main>
+
+  <script>
+    const tournamentData = {
+      "Inter": [
+        {
+          phase: "1ª Fase (Todos)",
+          levels: ["Single 12", "Single 13"],
+          songs: ["Cynical", "Ercitite", "Faster Z", "Fracture Temporelle", "Odin", "The People Didn't Know"]
+        },
+        {
+          phase: "2ª Fase (16 jogadores)",
+          levels: ["Single 13", "Single 14"],
+          songs: ["Arirang", "Binary Star", "Crash-Landing Rendezvous", "Freedom Dive", "Mahika", "Violet Perfume"]
+        },
+        {
+          phase: "3ª Fase (10 jogadores)",
+          levels: ["Single 14", "Single 15", "Single 16 (2 músicas)"],
+          songs: ["Digitalis", "Pumptris Quattro", "Spooky Macaron", "Ultimate Eyes", "We Love Your Step"]
+        },
+        {
+          phase: "4ª Fase (6 jogadores)",
+          levels: ["Single 15", "Single 16 (2 músicas)", "Single 17 (2 músicas)"],
+          songs: ["Altale", "Alice in Misanthrope", "Blazor", "Do The Dance", "You And I", "404 (New Era)", "Aragami", "Horang Pungryuga", "Lucky Star", "Sonic Boom", "T.B.H.", "That Kitty", "R.I.P.", "Pull Me Up", "Vanish 2"]
+        }
+      ],
+      "Advanced": [
+        {
+          phase: "1ª Fase (Todos)",
+          levels: ["Single 16", "Single 17"],
+          songs: ["Appassionata", "Bang Bang", "Brain Power", "Imaginarized City", "Legendary Dominion"]
+        },
+        {
+          phase: "2ª Fase (12 jogadores)",
+          levels: ["Single 17", "Single 18"],
+          songs: ["Canon-D", "Dark Side of the Mind", "Etude", "Dreamchasers", "Kings Tomb"]
+        },
+        {
+          phase: "3ª Fase (8 jogadores)",
+          levels: ["Single 18", "Single 19", "Single 20", "Single 21"],
+          songs: ["B3", "Infinite Enerzy -Overdose-", "Irellia", "Gargoyle", "Trickl4sh", "Hercules", "Murdoch vs Otada", "Neo Catharsis", "Overnight Flower", "Vacuum", "Curiosity Overdrive", "Legendary Dominion", "Prima Materia", "T.B.H.", "Break Through Myself", "Punishment Restaurant", "The Last Rebellion", "Infinity"]
+        }
+      ],
+      "Expert": [
+        {
+          phase: "1ª Fase (Todos)",
+          levels: ["Single 18", "Single 19"],
+          songs: ["Antique Serenade", "Digitalis", "Ercitite", "Heart Attack", "The Apocalypse", "Unfelicitas"]
+        },
+        {
+          phase: "2ª Fase (12 jogadores)",
+          levels: ["Single 19", "Single 20"],
+          songs: ["Athenas Shield", "Crash Landing Redenzvous", "Pull Me Up", "Solfeggietto", "Sudden Appearence Image"]
+        },
+        {
+          phase: "3ª Fase (6 jogadores)",
+          levels: ["Single 20", "Single 21", "Single 22 (2 músicas)"],
+          songs: ["Super Haraguro Pop", "B3", "God Mode", "Kings Tomb", "Kugutsu"]
+        },
+        {
+          phase: "4ª Fase (3 jogadores)",
+          levels: ["Single 21", "Single 22 (2 músicas)", "Single 23", "Double 22", "Double 23"],
+          songs: ["404 New era", "Freedom Dive", "Dead End", "Blazor", "Enjoy The Show", "Bang Bang", "Hercules", "Goodtek", "Heliosphere", "NightTheater", "R.I.P.", "Rise Up", "Quattourux", "Dizzy Dance Street Light", "The Last Rebellion", "Infinite Enerzy Overdose", "TBH", "Rush Hour", "See", "Cynical"]
+        }
+      ],
+      "CoOp": [
+        {
+          phase: "1ª Fase (Todos)",
+          levels: ["Co-Op"],
+          songs: ["Adrenaline Blaster", "Beethoven Virus", "Rolling Christmas", "Stardream"]
+        },
+        {
+          phase: "2ª Fase (6 duplas)",
+          levels: ["Co-Op"],
+          songs: ["Bang Bang", "Csikos Post", "Pop The Track", "Turkey March"]
+        }
+      ]
+    };
+
+    let activeCategory = 'all';
+
+    function setCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-amber-500 text-slate-950";
+        } else {
+          btn.className = "tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 hover:bg-slate-600 text-slate-100";
+        }
+      });
+      render();
+    }
+
+    function render() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const container = document.getElementById('content');
+      container.innerHTML = '';
+
+      const categoriesToRender = activeCategory === 'all' 
+        ? Object.keys(tournamentData) 
+        : [activeCategory];
+
+      categoriesToRender.forEach(cat => {
+        const phases = tournamentData[cat];
+        let categoryHasMatch = false;
+
+        const catSection = document.createElement('section');
+        catSection.className = 'bg-slate-800/60 border border-slate-700/60 rounded-2xl p-6 backdrop-blur';
+
+        let html = `<h2 class="text-xl font-bold text-amber-400 mb-6 border-b border-slate-700 pb-2">${cat}</h2>`;
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
+
+        phases.forEach(p => {
+          const matchingSongs = p.songs.filter(s => s.toLowerCase().includes(query));
+          if (matchingSongs.length > 0) {
+            categoryHasMatch = true;
+            html += `
+              <div class="bg-slate-900/80 rounded-xl p-5 border border-slate-700/80">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="font-bold text-slate-200">${p.phase}</h3>
+                  <span class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded-md">
+                    ${p.levels.join(' • ')}
+                  </span>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-4">
+                  ${matchingSongs.map(song => `<span class="bg-slate-800 border border-slate-700 text-slate-300 text-sm px-3 py-1.5 rounded-lg">${song}</span>`).join('')}
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        html += `</div>`;
+        catSection.innerHTML = html;
+
+        if (categoryHasMatch) {
+          container.appendChild(catSection);
+        }
+      });
+
+      if (container.children.length === 0) {
+        container.innerHTML = `<p class="text-center text-slate-500 py-12">Nenhuma música encontrada com esse nome.</p>`;
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
