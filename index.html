@@ -243,23 +243,23 @@
                       </div>
                       <div class="flex flex-wrap gap-1.5 mt-3">
                         ${lvl.songs.map(song => {
-                          const isGreen = greenSongs.includes(song);
-                          
-                          if (isGreen) {
-                            return `
-                              <span class="border text-xs px-2.5 py-1 rounded-md transition bg-emerald-950/80 border-emerald-500/80 text-emerald-300 font-bold shadow-sm shadow-emerald-900/50 inline-flex items-center gap-1.5">
-                                ${song}
-                                <span class="bg-emerald-500 text-slate-950 text-[10px] font-black px-1 py-0.2 rounded uppercase tracking-wider">NEW</span>
-                              </span>
-                            `;
-                          }
+  const isGreen = greenSongs.includes(song);
+  
+  if (isGreen) {
+    return `
+      <span class="border text-xs px-2.5 py-1 rounded-md transition bg-emerald-950/80 border-emerald-500/80 text-emerald-300 font-bold shadow-sm shadow-emerald-900/50 inline-flex items-center gap-1.5">
+        ${song}
+        <img src="new.png" alt="NEW" class="h-3 w-auto object-contain">
+      </span>
+    `;
+  }
 
-                          return `
-                            <span class="border text-xs px-2.5 py-1 rounded-md transition bg-slate-900 border-slate-700 text-slate-300">
-                              ${song}
-                            </span>
-                          `;
-                        }).join('')}
+  return `
+    <span class="border text-xs px-2.5 py-1 rounded-md transition bg-slate-900 border-slate-700 text-slate-300">
+      ${song}
+    </span>
+  `;
+}).join('')}
                       </div>
                     </div>
                   `).join('')}
